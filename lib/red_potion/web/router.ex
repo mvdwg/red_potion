@@ -15,8 +15,6 @@ defmodule RedPotion.Web.Router do
 
   scope "/", RedPotion.Web do
     pipe_through :browser # Use the default browser stack
-
-    get "/", PageController, :index
   end
 
   # Other scopes may use custom stacks.
