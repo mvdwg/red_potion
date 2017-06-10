@@ -17,7 +17,7 @@ defmodule RedPotion.Web.Router do
     pipe_through :browser # Use the default browser stack
 
     resources "/counters", CounterController do
-      resources "/values", CounterValueController, as: :value
+      resources "/values", CounterValueController, only: [:new, :create, :index], as: :value
     end
   end
 

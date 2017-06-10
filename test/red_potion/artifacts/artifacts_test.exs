@@ -3,21 +3,22 @@ defmodule RedPotion.ArtifactsTest do
 
   alias RedPotion.Artifacts
 
+  @valid_attrs %{name: "some name"}
+
+  def counter_fixture(attrs \\ %{}) do
+    {:ok, counter} =
+      attrs
+      |> Enum.into(@valid_attrs)
+      |> Artifacts.create_counter()
+
+    counter
+  end
+ 
   describe "counters" do
     alias RedPotion.Artifacts.Counter
 
-    @valid_attrs %{name: "some name"}
     @update_attrs %{name: "some updated name"}
     @invalid_attrs %{name: nil}
-
-    def counter_fixture(attrs \\ %{}) do
-      {:ok, counter} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Artifacts.create_counter()
-
-      counter
-    end
 
     test "list_counters/0 returns all counters" do
       counter = counter_fixture()
@@ -64,62 +65,35 @@ defmodule RedPotion.ArtifactsTest do
   end
 
   describe "counter_values" do
-    alias RedPotion.Artifacts.CounterValue
+    alias RedPotion.Artifacts.{ CounterValue, Counter }
 
-    @valid_attrs %{value: 42}
-    @update_attrs %{value: 43}
-    @invalid_attrs %{value: nil}
-
-    def counter_value_fixture(attrs \\ %{}) do
-      {:ok, counter_value} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Artifacts.create_counter_value()
+    def counter_value_fixture(%Counter{ id: id }) do
+      {:ok, counter_value} = Artifacts.create_counter_value(%{ value: 1, counter_id: id })
 
       counter_value
     end
 
-    test "list_counter_values/0 returns all counter_values" do
-      counter_value = counter_value_fixture()
+    setup do
+      {:ok, %{ counter: counter_fixture()}}
+    end
+
+    test "list_counter_values/0 returns all counter_values", %{ counter: counter } do
+      counter_value = counter_value_fixture(counter)
       assert Artifacts.list_counter_values() == [counter_value]
     end
 
-    test "get_counter_value!/1 returns the counter_value with given id" do
-      counter_value = counter_value_fixture()
+    test "get_counter_value!/1 returns the counter_value with given id", %{ counter: counter } do
+      counter_value = counter_value_fixture(counter)
       assert Artifacts.get_counter_value!(counter_value.id) == counter_value
     end
 
-    test "create_counter_value/1 with valid data creates a counter_value" do
-      assert {:ok, %CounterValue{} = counter_value} = Artifacts.create_counter_value(@valid_attrs)
-      assert counter_value.value == 42
+    test "create_counter_value/1 with valid data creates a counter_value", %{ counter: counter } do
+      assert {:ok, %CounterValue{} = counter_value} = Artifacts.create_counter_value(%{ value: 1, counter_id: counter.id})
+      assert counter_value.value == 1 
     end
 
-    test "create_counter_value/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Artifacts.create_counter_value(@invalid_attrs)
-    end
-
-    test "update_counter_value/2 with valid data updates the counter_value" do
-      counter_value = counter_value_fixture()
-      assert {:ok, counter_value} = Artifacts.update_counter_value(counter_value, @update_attrs)
-      assert %CounterValue{} = counter_value
-      assert counter_value.value == 43
-    end
-
-    test "update_counter_value/2 with invalid data returns error changeset" do
-      counter_value = counter_value_fixture()
-      assert {:error, %Ecto.Changeset{}} = Artifacts.update_counter_value(counter_value, @invalid_attrs)
-      assert counter_value == Artifacts.get_counter_value!(counter_value.id)
-    end
-
-    test "delete_counter_value/1 deletes the counter_value" do
-      counter_value = counter_value_fixture()
-      assert {:ok, %CounterValue{}} = Artifacts.delete_counter_value(counter_value)
-      assert_raise Ecto.NoResultsError, fn -> Artifacts.get_counter_value!(counter_value.id) end
-    end
-
-    test "change_counter_value/1 returns a counter_value changeset" do
-      counter_value = counter_value_fixture()
-      assert %Ecto.Changeset{} = Artifacts.change_counter_value(counter_value)
+    test "create_counter_value/1 with invalid data returns error changeset", %{ counter: counter } do
+      assert {:error, %Ecto.Changeset{}} = Artifacts.create_counter_value(%{ value: nil, counter_id: counter.id })
     end
   end
 end

@@ -38,6 +38,15 @@ defmodule RedPotion.Artifacts do
   def get_counter!(id), do: Repo.get!(Counter, id)
 
   @doc """
+  Gets a single counter with values.
+  """
+  def get_counter_with_values!(id) do
+    id
+    |> get_counter!
+    |> Repo.preload(:values)
+  end
+
+  @doc """
   Creates a counter.
 
   ## Examples

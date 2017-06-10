@@ -1,6 +1,6 @@
 <h2>New Counter value</h2>
 
 <%= render "form.html", changeset: @changeset,
-                        action: counter_value_path(@conn, :create, 1) %>
+                        action: counter_value_path(@conn, :create, @counter.id) %>
 
 <span><%= link "Back", to: counter_value_path(@conn, :index, 1) %></span>

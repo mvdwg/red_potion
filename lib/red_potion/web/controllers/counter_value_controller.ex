@@ -3,57 +3,30 @@ defmodule RedPotion.Web.CounterValueController do
 
   alias RedPotion.Artifacts
 
-  def index(conn, _params) do
-    counter_values = Artifacts.list_counter_values()
-    render(conn, "index.html", counter_values: counter_values)
+  def index(conn, params) do
+    counter = Artifacts.get_counter_with_values!(params["counter_id"])
+    render(conn, "index.html", counter_values: counter.values, counter: counter)
   end
 
-  def new(conn, _params) do
+  # GET /counters/:counter_id/values/new
+  def new(conn, params) do
+    counter = Artifacts.get_counter!(params["counter_id"])
     changeset = Artifacts.change_counter_value(%RedPotion.Artifacts.CounterValue{})
-    render(conn, "new.html", changeset: changeset)
+    render(conn, "new.html", changeset: changeset, counter: counter)
   end
 
-  def create(conn, %{"counter_value" => counter_value_params}) do
-    case Artifacts.create_counter_value(counter_value_params) do
-      {:ok, counter_value} ->
+  def create(conn, %{"counter_value" => counter_value_params, "counter_id" => counter_id}) do
+    counter_value_params
+    |> Map.put("counter_id", counter_id)
+    |> IO.inspect
+    |> Artifacts.create_counter_value
+    |> case do
+      {:ok, _counter_value} ->
         conn
         |> put_flash(:info, "Counter value created successfully.")
-        |> redirect(to: counter_value_path(conn, :show, 1, counter_value))
+        |> redirect(to: counter_value_path(conn, :index, counter_id))
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
-  end
-
-  def show(conn, %{"id" => id}) do
-    counter_value = Artifacts.get_counter_value!(id)
-    render(conn, "show.html", counter_value: counter_value)
-  end
-
-  def edit(conn, %{"id" => id}) do
-    counter_value = Artifacts.get_counter_value!(id)
-    changeset = Artifacts.change_counter_value(counter_value)
-    render(conn, "edit.html", counter_value: counter_value, changeset: changeset)
-  end
-
-  def update(conn, %{"id" => id, "counter_value" => counter_value_params}) do
-    counter_value = Artifacts.get_counter_value!(id)
-
-    case Artifacts.update_counter_value(counter_value, counter_value_params) do
-      {:ok, counter_value} ->
-        conn
-        |> put_flash(:info, "Counter value updated successfully.")
-        |> redirect(to: counter_value_path(conn, :show, 1, counter_value))
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", counter_value: counter_value, changeset: changeset)
-    end
-  end
-
-  def delete(conn, %{"id" => id}) do
-    counter_value = Artifacts.get_counter_value!(id)
-    {:ok, _counter_value} = Artifacts.delete_counter_value(counter_value)
-
-    conn
-    |> put_flash(:info, "Counter value deleted successfully.")
-    |> redirect(to: counter_value_path(conn, :index, 1))
   end
 end

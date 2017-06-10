@@ -4,7 +4,7 @@ defmodule RedPotion.Repo.Migrations.CreateRedPotion.Artifacts.CounterValue do
   def change do
     create table(:artifacts_counter_values) do
       add :value, :integer
-      add :counter_id, references(:artifacts_counters, on_delete: :nothing)
+      add :counter_id, references(:artifacts_counters, on_delete: :delete_all), null: false
 
       timestamps()
     end
