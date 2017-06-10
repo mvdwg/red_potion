@@ -1,0 +1,26 @@
+<h2>Listing Counter values</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Value</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for counter_value <- @counter_values do %>
+    <tr>
+      <td><%= counter_value.value %></td>
+
+      <td class="text-right">
+        <span><%= link "Show", to: counter_value_path(@conn, :show, 1, counter_value), class: "btn btn-default btn-xs" %></span>
+        <span><%= link "Edit", to: counter_value_path(@conn, :edit, 1, counter_value), class: "btn btn-default btn-xs" %></span>
+        <span><%= link "Delete", to: counter_value_path(@conn, :delete, 1, counter_value), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Counter value", to: counter_value_path(@conn, :new, 1) %></span>

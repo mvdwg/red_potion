@@ -15,6 +15,10 @@ defmodule RedPotion.Web.Router do
 
   scope "/", RedPotion.Web do
     pipe_through :browser # Use the default browser stack
+
+    resources "/counters", CounterController do
+      resources "/values", CounterValueController, as: :value
+    end
   end
 
   # Other scopes may use custom stacks.
