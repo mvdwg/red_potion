@@ -9,3 +9,6 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+RedPotion.Repo.insert!(%RedPotion.Artifacts.Counter{name: "Bugs per sprint"})
+RedPotion.Repo.insert!(%RedPotion.Artifacts.Counter{name: "Rejections per sprint"})
